@@ -94,6 +94,10 @@ async def startup_event():
 @app.get("/api/products")
 async def get_products():
     products = await db.products.find().to_list(1000)
+    # Remove MongoDB ObjectId to make it JSON serializable
+    for product in products:
+        if "_id" in product:
+            del product["_id"]
     return products
 
 @app.get("/api/products/{product_id}")
@@ -101,6 +105,9 @@ async def get_product(product_id: str):
     product = await db.products.find_one({"id": product_id})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    # Remove MongoDB ObjectId to make it JSON serializable
+    if "_id" in product:
+        del product["_id"]
     return product
 
 @app.post("/api/create-order")
