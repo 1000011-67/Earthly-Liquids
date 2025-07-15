@@ -167,6 +167,10 @@ async def verify_payment(payment_data: dict):
 @app.get("/api/orders")
 async def get_orders():
     orders = await db.orders.find().to_list(1000)
+    # Remove MongoDB ObjectId to make it JSON serializable
+    for order in orders:
+        if "_id" in order:
+            del order["_id"]
     return orders
 
 @app.get("/")
